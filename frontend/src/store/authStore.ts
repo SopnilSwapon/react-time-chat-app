@@ -19,6 +19,7 @@ export interface IAuthState {
 
   checkAuth: () => Promise<void>;
   signup: (data: TSignUpFormData) => Promise<void>;
+  logout: () => Promise<void>;
   connectSocket: () => void;
 }
 export const authStore = createStore<IAuthState>((set, get) => ({
@@ -53,6 +54,15 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       toast.error(error?.response?.data.message);
     } finally {
       set({ isSigningUp: false });
+    }
+  },
+  logout: async () => {
+    try {
+      await axiosInstance.post("/auth/logout");
+      set({ authUser: null });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.message || "Something is wrong!");
     }
   },
   connectSocket: () => {
