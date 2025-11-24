@@ -1,6 +1,6 @@
 
 import { useStore } from "zustand";
-import { authStore, type AuthState } from "./authStore";
+import { authStore, type IAuthState } from "./authStore";
 
-export const useAuthStore = <T>(selector: (state: AuthState) => T) =>
+export const useAuthStore = <T>(selector: (state: IAuthState) => T) =>
   useStore(authStore, selector);
