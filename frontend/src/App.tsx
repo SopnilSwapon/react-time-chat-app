@@ -21,7 +21,6 @@ export default function App() {
       </div>
     );
   }
-  console.log(authUser, "check the auth user data");
   return (
     <div>
       <Navbar />
