@@ -69,12 +69,12 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
-
       get().connectSocket();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error, "check user error of login");
       toast.error(error.response.data.message);
+      throw error;
     } finally {
       set({ isLoggingIn: false });
     }

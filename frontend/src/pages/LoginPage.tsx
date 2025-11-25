@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import AuthImagePattern from "../components/AuthImagePattern";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 
 export type TLoginFormData = {
@@ -16,11 +16,19 @@ const LoginPage = () => {
     password: "",
   });
   const { login, isLoggingIn } = useAuthStore((state) => state);
-
+  const navigate = useNavigate();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    login(formData);
+
+    try {
+      await login(formData); // will throw if incorrect credentials
+      navigate("/"); // only runs if login SUCCESS
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      // do nothing — error already handled in the store
+    }
   };
 
   return (
