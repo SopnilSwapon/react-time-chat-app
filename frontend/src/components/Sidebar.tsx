@@ -2,16 +2,16 @@ import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import { User } from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
 
 export default function Sidebar() {
   const { users, getUsers, selectedUser, setSelectedUser, isUsersLoading } =
     useChatStore((state) => state);
-  const onlineUsers: [] = [];
+  const { onlineUsers } = useAuthStore((state) => state);
   useEffect(() => {
     getUsers();
   }, [getUsers]);
   if (isUsersLoading) return <SidebarSkeleton />;
-  console.log(users, "check suers");
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
       <div className="border-b border-base-300 w-full p-5">
@@ -37,10 +37,10 @@ export default function Sidebar() {
             <div className="relative mx-auto lg:mx-0">
               <img
                 src={user.profilePic || "/avatar.png"}
-                alt={user.name}
+                alt={user.fullName}
                 className="size-12 object-cover rounded-full"
               />
-              {onlineUsers?.includes(user?._id) && (
+              {onlineUsers?.includes(user._id) && (
                 <span
                   className="absolute bottom-0 right-0 size-3 bg-green-500 
                   rounded-full ring-2 ring-zinc-900"
@@ -51,7 +51,7 @@ export default function Sidebar() {
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user?._id) ? "Online" : "Offline"}
+                {onlineUsers?.includes(user._id) ? "Online" : "Offline"}
               </div>
             </div>
           </button>

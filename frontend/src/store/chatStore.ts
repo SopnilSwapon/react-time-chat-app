@@ -12,19 +12,19 @@ export interface IChathUser {
 
 export interface IChatState {
   users: IChathUser[] | null;
-  message: [] | null;
+  messages: [] | null;
   isMessagesLoading: boolean;
   isUsersLoading: boolean;
   selectedUser: IChathUser | null;
 
   getUsers: () => Promise<void>;
-  getMessages: (userId: number) => Promise<void>;
-  setSelectedUser: (selectedUser: IChathUser) => Promise<void>;
+  getMessages: (userId: string) => Promise<void>;
+  setSelectedUser: (selectedUser: IChathUser | null) => Promise<void>;
 }
 
 export const chatStore = createStore<IChatState>((set) => ({
   users: null,
-  message: null,
+  messages: null,
   selectedUser: null,
   isMessagesLoading: false,
   isUsersLoading: false,
@@ -47,7 +47,7 @@ export const chatStore = createStore<IChatState>((set) => ({
     set({ isMessagesLoading: true });
     try {
       const res = await axiosInstance.get(`/messages/${userId}`);
-      set({ message: res.data });
+      set({ messages: res.data });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.response.data.message);

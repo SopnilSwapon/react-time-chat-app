@@ -14,6 +14,7 @@ export interface IAuthUser {
 
 export interface IAuthState {
   authUser: IAuthUser | null;
+  onlineUsers: string[] | null;
   isSigningUp: boolean;
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
@@ -32,6 +33,8 @@ export const authStore = createStore<IAuthState>((set, get) => ({
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
+
+  onlineUsers: [],
 
   checkAuth: async () => {
     try {
