@@ -9,11 +9,13 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 
 export default function App() {
-  const { authUser, isCheckingAuth, checkAuth } = useAuthStore((s) => s);
+  const { authUser, isCheckingAuth, checkAuth, onlineUsers } = useAuthStore(
+    (s) => s
+  );
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
+  console.log(onlineUsers, "check online users");
   if (isCheckingAuth && !authUser) {
     return (
       <div className="h-screen flex justify-center items-center">
