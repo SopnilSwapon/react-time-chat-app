@@ -1,6 +1,7 @@
 import { toast } from "react-toastify";
 import { createStore } from "zustand";
 import { axiosInstance } from "../lib/axios";
+import { authStore } from "./authStore";
 
 export interface IChathUser {
   _id: string;
@@ -18,8 +19,8 @@ export type TMessage = {
   senderId?: string;
 };
 export interface IChatState {
-  users: IChathUser[] | null;
   messages: TMessage[] | null;
+  users: IChathUser[] | null;
   isMessagesLoading: boolean;
   isUsersLoading: boolean;
   selectedUser: IChathUser | null;
@@ -27,12 +28,14 @@ export interface IChatState {
   getUsers: () => Promise<void>;
   getMessages: (userId: string) => Promise<void>;
   sendMessage: (message: TMessage) => Promise<void>;
+  subscribeToMessages: () => void;
+  unSubscribeToMessages: () => void;
   setSelectedUser: (selectedUser: IChathUser | null) => Promise<void>;
 }
 
 export const chatStore = createStore<IChatState>((set, get) => ({
-  users: null,
   messages: null,
+  users: null,
   selectedUser: null,
   isMessagesLoading: false,
   isUsersLoading: false,
@@ -75,6 +78,22 @@ export const chatStore = createStore<IChatState>((set, get) => ({
     } catch (error: any) {
       toast.error(error?.response.data.message);
     }
+  },
+
+  subscribeToMessages: () => {
+    const { selectedUser } = get();
+    if (!selectedUser) return;
+    // todo: optimize this one later
+    const socket = authStore.getState().socket;
+    socket?.on("newMessage", (newMessage) => {
+      set({
+        messages: [...get().messages!, newMessage],
+      });
+    });
+  },
+  unSubscribeToMessages: () => {
+    const socket = authStore.getState().socket;
+    socket?.off("newMessage");
   },
 
   //   todo: optimize this one later

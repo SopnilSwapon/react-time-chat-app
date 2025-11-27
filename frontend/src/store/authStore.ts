@@ -47,7 +47,7 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
-      console.log("Error in checkAuth", error);
+      console.log(error, "check auth error");
     } finally {
       set({ isCheckingAuth: false });
     }
