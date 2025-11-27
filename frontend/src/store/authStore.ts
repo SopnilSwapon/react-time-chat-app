@@ -31,7 +31,8 @@ export interface IAuthState {
   disconnectSocket: () => void;
 }
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
 export const authStore = createStore<IAuthState>((set, get) => ({
   authUser: null,
   isSigningUp: false,
