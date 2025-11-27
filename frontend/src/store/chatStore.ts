@@ -83,9 +83,11 @@ export const chatStore = createStore<IChatState>((set, get) => ({
   subscribeToMessages: () => {
     const { selectedUser } = get();
     if (!selectedUser) return;
-    // todo: optimize this one later
     const socket = authStore.getState().socket;
     socket?.on("newMessage", (newMessage) => {
+      const isMessageSentFromSelectedUser =
+        newMessage.senderId === selectedUser._id;
+      if (!isMessageSentFromSelectedUser) return;
       set({
         messages: [...get().messages!, newMessage],
       });
