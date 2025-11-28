@@ -79,7 +79,7 @@ export default function MessageInput() {
         <div className="flex-1  flex gap-2">
           <input
             type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+            className="w-full input input-bordered rounded-lg input-md"
             placeholder="Type a message..."
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -88,26 +88,28 @@ export default function MessageInput() {
             type="file"
             accept="image/*"
             ref={fileInputRef}
-            className="hidden"
+            className="hidden pr-10 border border-red-600"
             onChange={handleImageChange}
           />
-          <button
-            type="button"
-            className={`hidden sm:flex cursor-pointer pt-2 btn-circle ${
-              imagePreview ? "text-emerald-500" : "text-zinc-400"
-            }`}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Image size={20} />
-          </button>
+          <div className="flex items-center absolute z-50 right-10 gap-3">
+            <button
+              type="button"
+              className={`flex cursor-pointer mt-1 btn-circle ${
+                imagePreview ? "text-emerald-500" : "text-zinc-400"
+              }`}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Image className="size-5 md:size-5" />
+            </button>
+            <button
+              type="submit"
+              className="btn pt-0.5 mt-1 btn-sm btn-circle"
+              disabled={!text.trim() && !imagePreview}
+            >
+              <Send className="size-4 md:size-5" />
+            </button>
+          </div>
         </div>
-        <button
-          type="submit"
-          className="btn pt-0.5 btn-sm btn-circle"
-          disabled={!text.trim() && !imagePreview}
-        >
-          <Send size={18} />
-        </button>
       </form>
     </div>
   );
