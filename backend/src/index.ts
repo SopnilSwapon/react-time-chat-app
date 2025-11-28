@@ -19,10 +19,19 @@ process.on("unhandledRejection", (err) => {
   console.error("🔥 UNHANDLED PROMISE REJECTION:", err);
 });
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://real-time-chat-app-1-0-iv2t.onrender.com",
+];
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      callback(null, true); // Allow all origins
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     },
     credentials: true,
   })
