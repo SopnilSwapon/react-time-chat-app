@@ -32,7 +32,10 @@ export interface IAuthState {
 }
 
 const BASE_URL =
-  import.meta.env.MODE === "development" ? "http://localhost:3000" : "/";
+  import.meta.env.MODE === "development"
+    ? "http://localhost:3000"
+    : "https://real-time-chat-app-005.onrender.com";
+
 export const authStore = createStore<IAuthState>((set, get) => ({
   authUser: null,
   isSigningUp: false,
