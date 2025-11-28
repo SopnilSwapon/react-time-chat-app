@@ -11,7 +11,6 @@ const io = new Server(server, {
       "http://localhost:5173",
       "https://real-time-chat-app-1-0-iv2t.onrender.com",
     ],
-    methods: ["GET", "POST"],
     credentials: true,
   },
 });
