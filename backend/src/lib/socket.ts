@@ -16,9 +16,7 @@ const io = new Server(server, {
   },
 });
 
-// -----------------------------
 // MULTI-SOCKET USER MAP
-// -----------------------------
 const userSocketMap: Record<string, Set<string>> = {};
 
 export function getReceiverSocketId(userId: string): string[] {
@@ -34,6 +32,15 @@ io.on("connection", (socket) => {
   }
 
   console.log(`User connected: ${userId} -> ${socket.id}`);
+
+  // register users
+  socket.on("register", (id) => {
+    if (!userSocketMap[id]) userSocketMap[id] = new Set();
+    userSocketMap[id].add(socket.id);
+    console.log("Registered user:", id, "->", socket.id);
+
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+  });
 
   // -----------------------------
   // 🌟 AUDIO CALL SIGNALING

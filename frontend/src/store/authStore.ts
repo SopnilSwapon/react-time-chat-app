@@ -189,9 +189,7 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       }
     });
 
-    // -------------------------
     // CALL ANSWERED
-    // -------------------------
     socket.on("call-answered", async ({ answer }) => {
       const { peerConnection, stopCallerRingtone, setInCall, setCalling } =
         callStore.getState();
@@ -210,9 +208,7 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       }
     });
 
-    // -------------------------
     // ICE CANDIDATES
-    // -------------------------
     socket.on("ice-candidate", async (candidate) => {
       const { peerConnection } = callStore.getState();
       if (!peerConnection) return;
@@ -231,9 +227,7 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       await peerConnection.addIceCandidate(candidate);
     });
 
-    // -------------------------
     // CALL END
-    // -------------------------
     socket.on("call-ended", () => {
       callStore.getState().endCall();
     });
