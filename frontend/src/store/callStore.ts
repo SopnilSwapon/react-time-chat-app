@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
 
 export type TCallState = {
@@ -10,6 +11,9 @@ export type TCallState = {
   acceptCall: () => void;
   rejectCall: () => void;
   endCall: () => void;
+  setPeerConnection: (data: any) => void;
+  setIncomingCall: (data: any) => void;
+  setCallerId: (data: any) => void;
 };
 
 export const callStore = create<TCallState>((set, get) => ({
@@ -18,30 +22,37 @@ export const callStore = create<TCallState>((set, get) => ({
   callerId: null,
   peerConnection: null,
 
+  setPeerConnection: (pc: any) => set({ peerConnection: pc }),
+  setIncomingCall: (value: any) => set({ incomingCall: value }),
+  setCallerId: (id: any) => set({ callerId: id }),
+
   startCall: async (receiverId) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const socket = (window as any).mainSocket;
+
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
 
     set({ peerConnection: pc, isCalling: true });
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
+
     stream.getTracks().forEach((t) => pc.addTrack(t, stream));
 
-    pc.onicecandidate = (e) => {
-      if (e.candidate) {
+    pc.onicecandidate = (event) => {
+      if (event.candidate) {
         socket.emit("ice-candidate", {
           to: receiverId,
-          candidate: e.candidate,
+          candidate: event.candidate,
         });
       }
     };
 
-    pc.ontrack = (e) => {
+    pc.ontrack = (event) => {
       const audio = document.getElementById("remoteAudio") as HTMLAudioElement;
-      audio.srcObject = e.streams[0];
+      audio.srcObject = event.streams[0];
       audio.play();
     };
 
@@ -53,16 +64,16 @@ export const callStore = create<TCallState>((set, get) => ({
 
   acceptCall: async () => {
     const { callerId, peerConnection } = get();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const socket = (window as any).mainSocket;
 
-    const pc = peerConnection!;
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    });
 
-    stream.getTracks().forEach((t) => pc.addTrack(t, stream));
+    stream.getTracks().forEach((t) => peerConnection?.addTrack(t, stream));
 
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
+    const answer = await peerConnection?.createAnswer();
+    await peerConnection?.setLocalDescription(answer);
 
     socket.emit("answer-call", { to: callerId, answer });
 
@@ -70,16 +81,15 @@ export const callStore = create<TCallState>((set, get) => ({
   },
 
   rejectCall: () => {
-    const { callerId } = get();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const socket = (window as any).mainSocket;
+    const { callerId } = get();
 
     socket.emit("end-call", { to: callerId });
+
     set({ incomingCall: false, callerId: null });
   },
 
   endCall: () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const socket = (window as any).mainSocket;
     const { callerId, peerConnection } = get();
 

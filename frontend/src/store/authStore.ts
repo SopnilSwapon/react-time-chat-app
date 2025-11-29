@@ -4,6 +4,7 @@ import type { TSignUpFormData } from "../pages/SignUpPage";
 import type { TLoginFormData } from "../pages/LoginPage";
 import { toast } from "react-toastify";
 import { io, Socket } from "socket.io-client";
+import { callStore } from "./callStore";
 
 export interface IAuthUser {
   _id: string;
@@ -119,16 +120,93 @@ export const authStore = createStore<IAuthState>((set, get) => ({
   connectSocket: () => {
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
-    const socket = io(BASE_URL, { query: { userId: authUser._id } });
+
+    const socket = io(BASE_URL, {
+      query: { userId: authUser._id },
+      withCredentials: true,
+    });
+
     socket.connect();
-    set({ socket: socket });
-    // explicitly register with the server (more reliable than query in some environments)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).mainSocket = socket; // IMPORTANT
+    set({ socket });
+
     socket.emit("register", authUser._id);
-    socket.on("getOnlineUsers", (userIds) => {
-      console.log(userIds, "check user ids from client side");
-      set({ onlineUsers: userIds });
+
+    socket.on("getOnlineUsers", (ids) => {
+      set({ onlineUsers: ids });
+    });
+
+    // -----------------------
+    // 📞 AUDIO CALL LISTENERS
+    // -----------------------
+
+    // Incoming call offer
+    socket.on("incoming-call", async ({ from, offer }) => {
+      console.log("📞 Incoming call from", from);
+      const { setIncomingCall, setCallerId, setPeerConnection } =
+        callStore.getState();
+
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      });
+
+      // Set global peer connection
+      setPeerConnection(pc);
+
+      // Save call details
+      setIncomingCall(true);
+      setCallerId(from);
+
+      // Get microphone stream
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      stream.getTracks().forEach((t) => pc.addTrack(t, stream));
+
+      // Incoming remote audio
+      pc.ontrack = (event) => {
+        const audio = document.getElementById(
+          "remoteAudio"
+        ) as HTMLAudioElement;
+        audio.srcObject = event.streams[0];
+        audio.play();
+      };
+
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit("ice-candidate", {
+            to: from,
+            candidate: event.candidate,
+          });
+        }
+      };
+
+      await pc.setRemoteDescription(offer);
+    });
+
+    // When receiver accepts → caller receives answer
+    socket.on("call-answered", async ({ answer }) => {
+      const { peerConnection } = callStore.getState();
+      if (peerConnection) {
+        await peerConnection.setRemoteDescription(answer);
+      }
+    });
+
+    // ICE candidate handling
+    socket.on("ice-candidate", async (candidate) => {
+      const { peerConnection } = callStore.getState();
+      if (peerConnection) {
+        await peerConnection.addIceCandidate(candidate);
+      }
+    });
+
+    // Call ended
+    socket.on("call-ended", () => {
+      callStore.getState().endCall();
     });
   },
+
   disconnectSocket: () => {
     const socket = get().socket;
     if (!socket) return;
