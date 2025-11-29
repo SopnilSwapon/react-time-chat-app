@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "../models/userModel";
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 
 interface ITokenPayload extends JwtPayload {
   userId?: string;
@@ -35,7 +35,6 @@ export const protectRoute = async (
     req.user = user;
     next();
   } catch (err) {
-    console.log("Error in protectedRoute middleware", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -1,6 +1,3 @@
-
 export default function SettingPage() {
-  return (
-    <div>SettingPage</div>
-  )
+  return <div className="mt-24">SettingPage</div>;
 }

@@ -2,14 +2,15 @@ import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import AuthImagePattern from "../components/AuthImagePattern";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
+import { Eye, EyeOff, Loader2, MessageSquare } from "lucide-react";
+import { toast } from "react-toastify";
 
 export type TLoginFormData = {
   email: string;
   password: string;
 };
 
-const LoginPage = () => {
+export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<TLoginFormData>({
     email: "",
@@ -17,17 +18,17 @@ const LoginPage = () => {
   });
   const { login, isLoggingIn } = useAuthStore((state) => state);
   const navigate = useNavigate();
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     try {
-      await login(formData); // will throw if incorrect credentials
-      navigate("/"); // only runs if login SUCCESS
+      await login(formData);
+      navigate("/");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.log(error, "check the error from login client");
-      // do nothing — error already handled in the store
+      toast.error(error?.message || "Something is wrong");
     }
   };
 
@@ -57,12 +58,9 @@ const LoginPage = () => {
                 <span className="label-text font-medium">Email</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-base-content/40" />
-                </div>
                 <input
                   type="email"
-                  className={`input input-bordered w-full pl-10`}
+                  className={`input input-bordered w-full pl-3`}
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) =>
@@ -77,12 +75,9 @@ const LoginPage = () => {
                 <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-base-content/40" />
-                </div>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className={`input input-bordered w-full pl-10`}
+                  className={`input input-bordered w-full pl-3`}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) =>
@@ -139,5 +134,4 @@ const LoginPage = () => {
       />
     </div>
   );
-};
-export default LoginPage;
+}

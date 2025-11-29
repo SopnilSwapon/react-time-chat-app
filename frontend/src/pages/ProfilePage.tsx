@@ -8,9 +8,8 @@ const ProfilePage = () => {
   );
   const [selectedImg, setSelectedImg] = useState<string | undefined>();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleImageUpload = async (e: any) => {
-    const file = e.target.files[0];
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();

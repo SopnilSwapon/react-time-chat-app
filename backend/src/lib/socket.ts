@@ -30,21 +30,14 @@ io.on("connection", (socket) => {
     if (!userSocketMap[userId]) userSocketMap[userId] = new Set();
     userSocketMap[userId].add(socket.id);
   }
-
-  console.log(`User connected: ${userId} -> ${socket.id}`);
-
   // register users
   socket.on("register", (id) => {
     if (!userSocketMap[id]) userSocketMap[id] = new Set();
     userSocketMap[id].add(socket.id);
-    console.log("Registered user:", id, "->", socket.id);
-
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 
-  // -----------------------------
-  // 🌟 AUDIO CALL SIGNALING
-  // -----------------------------
+  // Audio call signaling
 
   // Caller sends Offer
   socket.on("call-user", ({ to, offer }) => {
@@ -81,9 +74,7 @@ io.on("connection", (socket) => {
     targets.forEach((id) => io.to(id).emit("call-ended"));
   });
 
-  // -----------------------------
   // Disconnect
-  // -----------------------------
   socket.on("disconnect", () => {
     if (userId && userSocketMap[userId]) {
       userSocketMap[userId].delete(socket.id);

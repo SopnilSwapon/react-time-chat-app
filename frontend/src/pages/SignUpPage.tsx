@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import {
-  Eye,
-  EyeOff,
-  Loader2,
-  Lock,
-  Mail,
-  MessageSquare,
-  User,
-} from "lucide-react";
+import { Eye, EyeOff, Loader2, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import AuthImagePattern from "../components/AuthImagePattern";
@@ -20,7 +12,7 @@ export type TSignUpFormData = {
   password: string;
 };
 
-const SignUpPage = () => {
+export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<TSignUpFormData>({
     fullName: "",
@@ -45,8 +37,6 @@ const SignUpPage = () => {
   const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     const success = validateForm();
-    console.log(success, "check succes");
-
     if (success === true) signup(formData);
   };
 
@@ -77,12 +67,9 @@ const SignUpPage = () => {
                 <span className="label-text font-medium">Full Name</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="size-5 text-base-content/40" />
-                </div>
                 <input
                   type="text"
-                  className={`input input-bordered w-full pl-10`}
+                  className={`input input-bordered w-full pl-3`}
                   placeholder="John Doe"
                   value={formData.fullName}
                   onChange={(e) =>
@@ -97,12 +84,9 @@ const SignUpPage = () => {
                 <span className="label-text font-medium">Email</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="size-5 text-base-content/40" />
-                </div>
                 <input
                   type="email"
-                  className={`input input-bordered w-full pl-10`}
+                  className={`input input-bordered w-full pl-3`}
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) =>
@@ -117,12 +101,9 @@ const SignUpPage = () => {
                 <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="size-5 text-base-content/40" />
-                </div>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className={`input input-bordered w-full pl-10`}
+                  className={`input input-bordered w-full pl-3`}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) =>
@@ -178,5 +159,4 @@ const SignUpPage = () => {
       />
     </div>
   );
-};
-export default SignUpPage;
+}

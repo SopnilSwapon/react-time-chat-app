@@ -9,7 +9,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import ActiveCallModal from "./components/ActiveCallModal";
 import IncomingCallModal from "./components/IncomingCallModal";
-import CallingModal from "./components/callingModal";
+import CallingModal from "./components/CallingModal";
 
 export default function App() {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore((s) => s);

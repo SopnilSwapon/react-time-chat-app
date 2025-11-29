@@ -131,16 +131,14 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       set({ onlineUsers: ids });
     });
 
-    // -------------------------
-    // INCOMING CALL
-    // -------------------------
+    // Incoming call
     socket.on("incoming-call", async ({ from, offer }) => {
       const { receiveCall, setPeerConnection } = callStore.getState();
 
       receiveCall(from);
 
       const pc = new RTCPeerConnection({
-        iceTransportPolicy: "relay", // ⭐ FORCE TURN
+        iceTransportPolicy: "relay",
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
           {
@@ -154,10 +152,7 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       (pc as any)._queuedCandidates = [];
       setPeerConnection(pc);
 
-      // ❗ MUST be FIRST
       await pc.setRemoteDescription(offer);
-
-      // NOW add microphone
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach((t) => pc.addTrack(t, stream));
 
@@ -189,7 +184,7 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       }
     });
 
-    // CALL ANSWERED
+    //Call answered
     socket.on("call-answered", async ({ answer }) => {
       const { peerConnection, stopCallerRingtone, setInCall, setCalling } =
         callStore.getState();
@@ -208,7 +203,7 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       }
     });
 
-    // ICE CANDIDATES
+    // ICE Candidates
     socket.on("ice-candidate", async (candidate) => {
       const { peerConnection } = callStore.getState();
       if (!peerConnection) return;
@@ -227,7 +222,7 @@ export const authStore = createStore<IAuthState>((set, get) => ({
       await peerConnection.addIceCandidate(candidate);
     });
 
-    // CALL END
+    // Call end
     socket.on("call-ended", () => {
       callStore.getState().endCall();
     });
