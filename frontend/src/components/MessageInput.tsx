@@ -75,7 +75,10 @@ export default function MessageInput() {
           </div>
         </div>
       )}
-      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+      <form
+        onSubmit={handleSendMessage}
+        className="flex relative items-center gap-2"
+      >
         <div className="flex-1  flex gap-2">
           <input
             type="text"
@@ -91,7 +94,7 @@ export default function MessageInput() {
             className="hidden pr-10 border border-red-600"
             onChange={handleImageChange}
           />
-          <div className="flex items-center absolute z-50 right-10 gap-3">
+          <div className="flex items-center absolute z-50 right-1 md:right-2 gap-3">
             <button
               type="button"
               className={`flex cursor-pointer mt-1 btn-circle ${

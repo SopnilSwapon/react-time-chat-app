@@ -6,7 +6,6 @@ import { connectDB } from "./lib/db";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { app, server } from "./lib/socket";
-import path from "path";
 
 dotenv.config();
 
@@ -35,6 +34,5 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
 server.listen(port, () => {
-  console.log(`Server is running @${port} port`);
   connectDB();
 });

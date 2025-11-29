@@ -16,9 +16,7 @@ const io = new Server(server, {
   },
 });
 
-// -----------------------------
 // MULTI-SOCKET USER MAP
-// -----------------------------
 const userSocketMap: Record<string, Set<string>> = {};
 
 export function getReceiverSocketId(userId: string): string[] {
@@ -32,12 +30,14 @@ io.on("connection", (socket) => {
     if (!userSocketMap[userId]) userSocketMap[userId] = new Set();
     userSocketMap[userId].add(socket.id);
   }
+  // register users
+  socket.on("register", (id) => {
+    if (!userSocketMap[id]) userSocketMap[id] = new Set();
+    userSocketMap[id].add(socket.id);
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+  });
 
-  console.log(`User connected: ${userId} -> ${socket.id}`);
-
-  // -----------------------------
-  // 🌟 AUDIO CALL SIGNALING
-  // -----------------------------
+  // Audio call signaling
 
   // Caller sends Offer
   socket.on("call-user", ({ to, offer }) => {
@@ -74,9 +74,7 @@ io.on("connection", (socket) => {
     targets.forEach((id) => io.to(id).emit("call-ended"));
   });
 
-  // -----------------------------
   // Disconnect
-  // -----------------------------
   socket.on("disconnect", () => {
     if (userId && userSocketMap[userId]) {
       userSocketMap[userId].delete(socket.id);
